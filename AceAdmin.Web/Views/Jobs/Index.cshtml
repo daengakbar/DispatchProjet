@@ -1,0 +1,203 @@
+﻿@model IEnumerable<AceAdmin.Web.Models.JobsModel>
+@{
+    ViewBag.Title = "Jobs List";
+}
+@section PageHeader {
+    <div class="page-header">
+        <h1>
+            Jobs 
+            <small>
+                <i class="ace-icon fa fa-angle-double-right"></i>
+                Jobs List
+            </small>
+        </h1>
+    </div><!-- /.page-header -->
+}
+
+<link rel="stylesheet" href="~/assets/img/datepicker.min.css" />
+
+<div class="row-fluid">
+    <div class="table-header">
+        Jobs List
+        <div class="pull-right tableTools-container">
+            <a href="#add" class="btn btn-sm btn-success" role="button" id="btnadd">
+                <i class="ace-icon fa fa-plus"></i> Add Data
+            </a>
+            <a href="#reload" class="btn btn-sm btn-danger" role="button" id="btnreload">
+                <i class="fa fa-refresh "></i> Reload
+            </a>
+        </div>
+    </div>
+    <div id="viewData">
+        @Html.Partial("ViewData", Model)
+    </div>
+ </div>
+
+    <div id="modal-jobs" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    Jobs List
+                </div>
+                <div class="panel-body">
+                    <form class="form-vertical" id="my-form">
+                        <div class="row-fluid">
+                       
+                            <input type="hidden" class="form-control" id="JobID">
+                            <div class="form-group">
+                                <label>Job Num</label>
+                                <input type="text" class="form-control" placeholder="Job Number" id="JobNum">
+                            </div>
+                            <div class="form-group">
+                                <label>Work ID</label>
+                                <select class="form-control" id="WorkID" name="WorkID">
+                                    <option value="">- Please select Worker -</option>
+                                    <option value="1">Akbar</option>
+                                    <option value="2">Satria</option>
+                                    <option value="3">Tony</option>
+                                    <option value="4">Reza</option>
+                                </select>
+                            </div>
+                            <div class="form-group">  
+                                <label>location</label>
+                                <input type="text"  class="form-control" placeholder="Location" id="Location">
+                            </div>
+                            <div class="form-group">
+                                <label>Duration</label>
+                                <input type="text" class="form-control" placeholder="Duration" id="Duration">
+                            </div>
+                            <div class="form-group"> 
+                                <label>Start Date</label>
+                                <input class="form-control date-picker" name="StartDate" id="StartDate" type="text" data-date-format="dd-mm-yyyy" value="<?php echo $ddate;?>" />
+                            </div>
+                            <div class="form-group">  
+                                <label>End Date</label>
+                                <input class="form-control date-picker" id="EndDate" type="text" data-date-format="dd-mm-yyyy" value="<?php echo $ddate;?>" />
+                            </div>
+                             
+                            <div class="form-group">
+                                <label>Vehicle</label>
+                                <select class="form-control" id="VehiID" name="VehiID">
+                                    <option value="">- Please select Vehicle -</option>
+                                    <option value="DD1234EO">DD1234EO</option>
+                                    <option value="B1234WNE">B1234WNE</option>
+                                </select>
+                            </div>                  
+                        </div>
+                        <br>
+                        <div class="pull-right">
+                            <a href="#" class="btn btn-sm btn-danger" role="button" data-dismiss="modal"><i class="fa fa-close"></i> Close</a>
+                            <a href="#" class="btn btn-sm btn-success" role="button" id="btnsave"><i class="fa fa-floppy-o"></i> Save</a>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    
+@section PagePluginScripts {
+    <script type="text/javascript" src="~/assets/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="~/assets/js/jquery.dataTables.bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/assets/js/dataTables.tableTools.min.js"></script>
+    <script type="text/javascript" src="~/assets/js/dataTables.colVis.min.js"></script>
+
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDKO4CwQlHhe_apWYpMr74hz4MTmcjoY4o&callback=initMap"></script>
+}
+
+    @section PageInlineScripts {
+<script type="text/javascript">
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (p) {
+            var LatLng = new google.maps.LatLng(p.coords.latitude, p.coords.longitude);
+            setCookie("LatLng", LatLng, 50);
+        });
+    } else {
+        alert('Geo Location feature is not supported in this browser.');
+    }
+</script>
+        <script type="text/javascript">
+            jQuery(function ($) {
+                var oTable1 =
+                $('#ListTable').dataTable();
+            })
+           
+            var now = new Date(), day = now.getDate(), year = now.getFullYear(), month = now.getMonth() + 1;
+            if (day.toString().length == 1) { var day = '0' + day; } if (month.toString().length == 1) { var month = '0' + month; }
+            var tgl = day + '-' + month + '-' + year
+
+            function setCookie(cname, cvalue, exdays) {
+                var d = new Date();
+                d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+                var expires = "expires=" + d.toUTCString();
+                document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+            }
+            function getCookie(c_name) {
+                var i, x, y, ARRcookies = document.cookie.split(";");
+                for (i = 0; i < ARRcookies.length; i++) {
+                    x = ARRcookies[i].substr(0, ARRcookies[i].indexOf("="));
+                    y = ARRcookies[i].substr(ARRcookies[i].indexOf("=") + 1);
+                    x = x.replace(/^\s+|\s+$/g, "");
+                    if (x == c_name) {
+                        return unescape(y);
+                    }
+                }
+            }
+
+            function LoadData() {
+                $.ajax({
+                    type: 'POST',
+                    url: '/Jobs/Loaddata',
+                    cache: false,
+                    success: function (data) {
+                        this.html(data);
+                    }
+                });
+            }
+
+            $("#btnreload").click(function () {
+                location.reload();
+            });
+            $("#btnadd").click(function () {
+                var MyLoc = getCookie("LatLng");
+                $("#modal-jobs").modal('show');
+                $('#JobID').val('');
+                $('#JobNum').val('');
+                $('#WorkID').val('');
+                $('#Location').val(MyLoc);
+                $('#Duration').val('');
+                $('#StartDate').val(tgl);
+                $('#EndDate').val(tgl);
+                $('#VehiID').val('');
+                $('#JobNum').focus();
+
+                //$('#latling').attr("readonly",true);
+            });
+            $("#btnsave").click(function () {
+                var params = {
+                   // nJobID: $('#JobID').val(),
+                    cJobNum: $('#JobNum').val(),
+                    nWorkID: $('#WorkID').val(),
+                    cDuration: $('#Duration').val(),
+                    cLocation: $('#Location').val(),
+                    dStartDate: $('#StartDate').val(),
+                    dEndDate: $('#EndDate').val(),
+                    nVehiID: $('#VehiID').val(),
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: '/Jobs/saveData',
+                    data: params,
+                    success: function (data) {
+                        $("#modal-jobs").modal('hide');
+                        location.reload();
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Update Error occurred - ' + error);
+                    }
+                });
+            });
+        </script>
+      
+    }

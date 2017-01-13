@@ -1,0 +1,63 @@
+﻿
+@model IEnumerable<AceAdmin.Web.Models.VehicleModel>
+@{
+    ViewBag.Title = "VehicleList";
+}
+
+<div class="row">
+    <div class="col-xs-12">
+        <!-- div.dataTables_borderWrap -->
+        <div>
+            <table class="table table-striped table-bordered table-hover table-checkable order-column" id="DataTable">
+                <thead>
+                    <tr>
+                        <th>Vehicle ID</th>
+                        <th>License Plat</th>
+                        <th>Type</th>
+                        <th>Start Add</th>
+                        <th>End Add</th>
+                        <th>Driver</th>
+                        <th class="text-center" width="100">#</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                        {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => item.nVehiID)</td>
+                            <td>@Html.DisplayFor(modelItem => item.cLicensePNum)</td>
+                            <td>@Html.DisplayFor(modelItem => item.cType)</td>
+                            <td>@Html.DisplayFor(modelItem => item.cStaAdd)</td>
+                            <td>@Html.DisplayFor(modelItem => item.cEndAdd)</td>
+                            <td>@Html.DisplayFor(modelItem => item.cDriver)</td>
+                            <td class="text-center">
+                                <a class="green" href="#modal-table" onclick="javascript: editData('@Html.DisplayFor(modelItem => item.nVehiID)')" data-toggle="modal">
+                                    <i class="ace-icon fa fa-pencil"></i>
+                                </a> |
+                                <a href="javascript:;" onclick="javascript: delData('@Html.DisplayFor(modelItem => item.nVehiID)', '@Html.DisplayFor(modelItem => item.cLicensePNum)')" class="tooltip-success" data-rel="tooltip" title="Delete">
+                                    <span class="red"><i class="ace-icon fa fa-trash-o bigger-130"></i></span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section PagePluginScripts {
+    <script src="~/assets/js/jquery.dataTables.min.js"></script>
+    <script src="~/assets/js/jquery.dataTables.bootstrap.min.js"></script>
+    <script src="~/assets/js/dataTables.tableTools.min.js"></script>
+    <script src="~/assets/js/dataTables.colVis.min.js"></script>
+}
+
+@section PageInlineScripts {
+<script>
+	$(document).ready(function() {
+		$('#DataTable').DataTable();
+	});
+</script>  -->
+}
+

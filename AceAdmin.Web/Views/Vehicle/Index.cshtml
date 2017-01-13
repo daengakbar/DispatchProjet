@@ -1,0 +1,157 @@
+﻿@{
+    ViewBag.Title = "Vehicle List";
+}
+@section PageHeader {
+    <div class="page-header">
+        <h1>
+            Vehicle 
+            <small>
+                <i class="ace-icon fa fa-angle-double-right"></i>
+                Vehicle List
+            </small>
+        </h1>
+    </div><!-- /.page-header -->
+}
+<div class="row-fluid">
+    <div class="table-header">
+        Vehicle List
+        <div class="pull-right tableTools-container">
+            <a href="#add" class="btn btn-sm btn-success" role="button" id="btnadd">
+                <i class="ace-icon fa fa-plus"></i> Add Data
+            </a>
+            <a href="#reload" class="btn btn-sm btn-danger" role="button" id="btnreload">
+                <i class="fa fa-refresh "></i> Reload
+            </a>
+        </div>
+    </div>
+    <div id="viewData"></div>
+ </div>
+
+    <div id="modal-vehicle" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                     Vehicle List
+                </div>
+                <div class="panel-body">
+                    <form class="form-vertical" id="my-form">
+                        <div class="row-fluid">
+                            <input type="hidden" class="form-control" placeholder="vehicle ID" name="VehiID" id="VehiID">
+                            <div class="form-group">
+                                <label>License P.Num</label>
+                                <input type="text" class="form-control" placeholder="Plat Number" name="LicensePNum" id="LicensePNum">
+                            </div>
+                            <div class="form-group">
+                                <label>Type Vehicle</label>
+                                <select class="form-control" id="Type" name="Type">
+                                    <option value="">- Please select a Type -</option>
+                                    <option value="Passenger Cars">Passenger Cars</option>
+                                    <option value="Pickup Trucks">Pickup Trucks</option>
+                                    <option value="Vans">Vans</option>
+                                    <option value="Minivans">Minivans</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Start Address</label>
+                                <input type="text" class="form-control" placeholder="Start Address" name="StaAdd" id="StaAdd">
+                            </div>
+                            <div class="form-group">
+                                <label>End Address</label>
+                                <input type="text" class="form-control" placeholder="End Address" name="EndAdd" id="EndAdd">
+                            </div>
+                            <div class="form-group">
+                                <label>Driver</label>
+                                <input type="text" class="form-control" placeholder="Driver" name="Driver" id="Driver">
+                            </div>
+                        </div>
+                        <br>
+                        <div class="pull-right">
+                            <a href="#" class="btn btn-sm btn-danger" role="button" data-dismiss="modal"><i class="fa fa-close"></i> Close</a>
+                            <a href="#" class="btn btn-sm btn-success" role="button" id="btnsave"><i class="fa fa-floppy-o"></i> Save</a>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    
+
+@section PagePluginScripts {
+    
+    <script type="text/javascript">
+        window.jQuery || document.write("<script src='~/assets/js/jquery.min.js'>" + "<" + "/script>");
+    </script>
+
+    
+}
+    @section PageInlineScripts {
+        <script type="text/javascript">
+            //VehiID, LicensePNum, Type, StaAdd, EndAdd, Driver
+
+            LoadData();
+            function LoadData() {
+                $.ajax({
+                    type: 'POST',
+                    url: '/Vehicle/Loaddata',
+                    cache: false,
+                    success: function (data) {
+                        $("#viewData").html(data);
+                    }
+                });
+            }
+            $("#btnadd").click(function () {
+                $("#modal-vehicle").modal('show');
+                $('#VehiID').val('');
+                $('#LicensePNum').val('');
+                $('#Type').val('');
+                $('#StaAdd').val('');
+                $('#EndAdd').val('');
+                $('#Driver').focus();
+            });
+
+            $("#btnsave").click(function () {
+                var vPnum = $('#LicensePNum').val();
+                if (vPnum.length == 0) { alert('Sorry, Plat Number Empty'); $("#LicensePNum").focus(); return false(); }
+
+                var params = {
+                    nVehiID: $('#VehiID').val(),
+                    cLicensePNum: $('#LicensePNum').val(),
+                    cType: $('#Type').val(),
+                    cStaAdd: $('#StaAdd').val(),
+                    cEndAdd: $('#EndAdd').val(),
+                    cDriver: $('#Driver').val(),
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: '/Vehicle/saveData',
+                    data: params,
+                    success: function (data) {
+                        $("#modal-vehicle").modal('hide');
+                        LoadData();
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Update Error occurred - ' + error);
+                    }
+                });
+            });
+            function delData(ID, nm) {
+                var pilih = confirm('Delete Data = ' + nm + '?');
+                if (pilih == true) {
+                    $.ajax({
+                        type: "POST",
+                        url: '/Vehicle/DeleteConf',
+                        data: "myID=" + ID,
+                        cache: false,
+                        success: function (data) {
+                            LoadData();
+                        },
+                        error: function (xhr, status, error) {
+                            alert('Delete Error occurred - ' + error);
+                        }
+                    });
+                }
+            }
+        </script>
+    }

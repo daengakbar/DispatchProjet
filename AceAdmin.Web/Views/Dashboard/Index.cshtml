@@ -1,0 +1,113 @@
+﻿
+@{
+    ViewBag.Title = "Dashboard";
+}
+
+@section PageHeader {
+<div class="page-header">
+    <h1>
+        Dashboard
+        <small>
+            <i class="ace-icon fa fa-angle-double-right"></i>
+            overview &amp; stats
+        </small>
+    </h1>
+</div><!-- /.page-header -->
+}
+
+<div class="alert alert-block alert-success">
+    <button type="button" class="close" data-dismiss="alert">
+        <i class="ace-icon fa fa-times"></i>
+    </button>
+
+    <i class="ace-icon fa fa-check green"></i>
+
+    Welcome to
+    <strong class="green">
+        Daeng AKBAR 
+        <small>(v1.3.3)</small>
+    </strong>,the lightweight, Dispatch Projet.
+</div>
+
+<div class="row">
+    <div class="space-6"></div>
+
+    <div class="col-sm-12">
+        <div class="widget-box">
+            <div class="widget-header widget-header-flat widget-header-small">
+                <h5 class="widget-title">
+                    <i class="ace-icon fa fa-signal"></i>
+                    Map Jobs
+                </h5>
+            </div>
+
+            <div class="widget-body">
+                <div class="widget-main">
+                    <div id="dvMap" style="height: 300px"></div>
+                </div><!-- /.widget-main -->
+            </div><!-- /.widget-body -->
+        </div><!-- /.widget-box -->
+    </div><!-- /.col -->
+</div><!-- /.row -->
+
+
+@section PagePluginScripts {
+    <!--[if lte IE 8]>
+      <script src="/assets/js/excanvas.min.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDKO4CwQlHhe_apWYpMr74hz4MTmcjoY4o&callback=initMap"></script>
+}
+
+@section PageInlineScripts {
+<script type="text/javascript">
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (p) {
+            var LatLng = new google.maps.LatLng(p.coords.latitude, p.coords.longitude);
+            var mapOptions = {
+                center: LatLng,
+                zoom: 13,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            var map = new google.maps.Map(document.getElementById("dvMap"), mapOptions);
+            
+            var marker = new google.maps.Marker({
+                position: LatLng,
+                map: map,
+                title: "<div style = 'height:60px;width:200px'><b>Your location:</b><br />Latitude: " + p.coords.latitude + "<br />Longitude: " + p.coords.longitude
+            });
+            google.maps.event.addListener(marker, "click", function (e) {
+                var infoWindow = new google.maps.InfoWindow();
+                infoWindow.setContent(marker.title);
+                infoWindow.open(map, marker);
+            });
+            
+            setCookie("LatLng", LatLng, 50);
+        });
+    } else {
+        alert('Geo Location feature is not supported in this browser.');
+    }
+</script>
+<script type="text/javascript">
+
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function checkCookie() {
+    var user = getCookie("username");
+    if (user != "") {
+        alert("Welcome again " + user);
+    } else {
+        user = prompt("Please enter your name:", "");
+        if (user != "" && user != null) {
+            setCookie("username", user, 365);
+        }
+    }
+}
+</script>
+}
+

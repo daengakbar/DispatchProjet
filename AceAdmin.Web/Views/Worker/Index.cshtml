@@ -1,0 +1,181 @@
+﻿@model IEnumerable<AceAdmin.Web.Models.WorkerModel>
+@{
+    ViewBag.Title = "Worker List";
+}
+
+@section PageHeader {
+    <div class="page-header">
+        <h1>
+            Worker 
+            <small>
+                <i class="ace-icon fa fa-angle-double-right"></i>
+                Worker List
+            </small>
+        </h1>
+    </div><!-- /.page-header -->
+}
+<div class="row-fluid">
+    <div class="table-header">
+        Worker List
+        <div class="pull-right tableTools-container">
+            <a href="#add" class="btn btn-sm btn-success" role="button" id="btnadd">
+                <i class="ace-icon fa fa-plus"></i> Add Data
+            </a>
+            <a href="#reload" class="btn btn-sm btn-danger" role="button" id="btnreload">
+                <i class="fa fa-refresh "></i> Reload
+            </a>
+        </div>
+    </div>
+    <div id="view_data">
+        @Html.Partial("ViewData", Model)
+    </div>
+ </div>
+
+ <div id="modal-worker" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    Worker List
+                </div>
+                <div class="panel-body">
+                    <form class="form-vertical" id="my-form">
+                        <div class="row-fluid">
+                            <input type="hidden" class="form-control" placeholder="Work ID" name="WorkID" id="WorkID">
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" class="form-control" placeholder="Work Name" name="WorkName" id="WorkName">
+                            </div>
+                            <div class="form-group">
+                                <label>IC Number</label>
+                                <input type="text" class="form-control" placeholder="IC number" name="ICnumber" id="ICnumber">
+                            </div>
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <input type="text" class="form-control" placeholder="Phone Number" name="PhoneNum" id="PhoneNum">
+                            </div>
+                            <div class="form-group">
+                                <label>Salary</label>
+                                <input type="text" class="form-control" placeholder="Salary" name="Salary" id="Salary">
+                            </div>
+                        </div>
+                        <br>
+                        <div class="pull-right">
+                            <a href="#" class="btn btn-sm btn-danger" role="button" data-dismiss="modal"><i class="fa fa-close"></i> Close</a>
+                            <a href="#" class="btn btn-sm btn-success" role="button" id="btnsave"><i class="fa fa-floppy-o"></i> Save</a>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+ </div>
+
+@section PagePluginScripts {
+    <script type="text/javascript" src="~/assets/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="~/assets/js/jquery.dataTables.bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/assets/js/dataTables.tableTools.min.js"></script>
+    <script type="text/javascript" src="~/assets/js/dataTables.colVis.min.js"></script>
+}
+
+@section PageInlineScripts {
+     <script type="text/javascript">
+            jQuery(function ($) {
+                 var oTable1 =
+                 $('#myTable').dataTable();
+            })
+            
+            $("#btnadd").click(function () {
+                $("#modal-worker").modal('show');
+                $('#WorkID').val('');
+                $('#WorkName').val('');
+                $('#ICnumber').val('');
+                $('#PhoneNum').val('');
+                $('#Salary').val('');
+                $('#WorkID').focus();
+            });
+            $("#btnreload").click(function () {
+                location.reload();
+            });
+            $('#modal-worker').on('shown', function () {
+                $('#WorkName').focus();
+            })
+
+            $("#btnsave").click(function () {
+                var wName = $('#WorkName').val();
+                if (wName.length == 0) { alert('Sorry, Name Worker Empty'); $("#WorkName").focus(); return false(); }
+
+                var params = {
+                    cWorkID: $('#WorkID').val(),
+                    cWorkName: $('#WorkName').val(),
+                    cICnumber: $('#ICnumber').val(),
+                    cPhoneNum: $('#PhoneNum').val(),
+                    nSalary: $('#Salary').val(),
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: '/Worker/saveData',
+                    data: params,
+                    success: function (data) {
+                        $("#modal-worker").modal('hide');
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Update Error occurred - ' + error);
+                    }
+                });
+
+            });
+            function editData(ID) {
+                $.ajax({
+                    url: '/Worker/editData',
+                    type: 'GET',
+                    data: { 'myID': ID },
+                    dataType: 'json',
+                    success: function (d) {
+                        $("#modal-worker").modal('show');
+                        $.each(d, function (i, val) {
+                            $('#WorkID').val(val.nWorkID);
+                            $('#WorkName').val(val.cWorkName);
+                            $('#ICnumber').val(val.cICnumber);
+                            $('#PhoneNum').val(val.cPhoneNum);
+                            $('#Salary').val(val.nSalary);
+                            $('#WorkName').focus();
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Update Error occurred - ' + error);
+                    }
+
+                });
+            }
+            function delData(ID, nm) {
+                var pilih = confirm('Delete Data = ' + nm + '?');
+                if (pilih == true) {
+                    $.ajax({
+                        type: "POST",
+                        url: '/Worker/DeleteConf',
+                        data: "myID=" + ID,
+                        cache: false,
+                        success: function (data) {
+                            LoadData();
+                        },
+                        error: function (xhr, status, error) {
+                            alert('Delete Error occurred - ' + error);
+                        }
+                    });
+                }
+            }
+            
+            function LoadData() {
+                $.ajax({
+                    type: 'POST',
+                    url: '/Worker/Loaddata',
+                    cache: false,
+                    success: function (data) {
+                        this.html(data);
+                        
+                    }
+                });
+            }
+        </script>
+    }
